@@ -5,10 +5,10 @@ require 'singleton'
 class FeedManager
   include Singleton
 
-  MAX_ITEMS = 4000
+  MAX_ITEMS = 12000
 
   # Must be <= MAX_ITEMS or the tracking sets will grow forever
-  REBLOG_FALLOFF = 400
+  REBLOG_FALLOFF = 120
 
   def key(type, id, subtype = nil)
     return "feed:#{type}:#{id}" unless subtype
