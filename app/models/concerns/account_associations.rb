@@ -39,6 +39,8 @@ module AccountAssociations
     # Moderation notes
     has_many :account_moderation_notes, dependent: :destroy, inverse_of: :account
     has_many :targeted_moderation_notes, class_name: 'AccountModerationNote', foreign_key: :target_account_id, dependent: :destroy, inverse_of: :target_account
+    has_many :account_warnings, dependent: :destroy, inverse_of: :account
+    has_many :targeted_account_warnings, class_name: 'AccountWarning', foreign_key: :target_account_id, dependent: :destroy, inverse_of: :target_account
 
     # Lists (that the account is on, not owned by the account)
     has_many :list_accounts, inverse_of: :account, dependent: :destroy
@@ -49,5 +51,8 @@ module AccountAssociations
 
     # Account migrations
     belongs_to :moved_to_account, class_name: 'Account', optional: true
+
+    # Hashtags
+    has_and_belongs_to_many :tags
   end
 end
