@@ -45,7 +45,7 @@ class Rack::Attack
     req.ip == '127.0.0.1' || req.ip == '::1'
   end
 
-  throttle('throttle_authenticated_api', limit: 300, period: 5.minutes) do |req|
+  throttle('throttle_authenticated_api', limit: 300, period: 1.minutes) do |req|
     req.api_request? && req.authenticated_user_id
   end
 
@@ -61,7 +61,7 @@ class Rack::Attack
     req.ip if req.post? && req.path == '/api/v1/accounts'
   end
 
-  throttle('protected_paths', limit: 25, period: 5.minutes) do |req|
+  throttle('protected_paths', limit: 2, period: 5.minutes) do |req|
     req.ip if req.post? && req.path =~ PROTECTED_PATHS_REGEX
   end
 
