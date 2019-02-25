@@ -46,14 +46,14 @@ class Rack::Attack
   end
 
   throttle('throttle_authenticated_api', limit: 300, period: 1.minutes) do |req|
-    req.api_request? && req.authenticated_user_id
+    req.authenticated_user_id if req.api_request?
   end
 
   throttle('throttle_unauthenticated_api', limit: 7_500, period: 5.minutes) do |req|
     req.ip if req.api_request?
   end
 
-  throttle('throttle_media', limit: 30, period: 30.minutes) do |req|
+  throttle('throttle_api_media', limit: 30, period: 30.minutes) do |req|
     req.authenticated_user_id if req.post? && req.path.start_with?('/api/v1/media')
   end
 
@@ -61,7 +61,14 @@ class Rack::Attack
     req.ip if req.post? && req.path == '/api/v1/accounts'
   end
 
-  throttle('protected_paths', limit: 2, period: 5.minutes) do |req|
+  API_DELETE_REBLOG_REGEX = /\A\/api\/v1\/statuses\/[\d]+\/unreblog/.freeze
+  API_DELETE_STATUS_REGEX = /\A\/api\/v1\/statuses\/[\d]+/.freeze
+
+  throttle('throttle_api_delete', limit: 30, period: 1.minutes) do |req|
+    req.authenticated_user_id if (req.post? && req.path =~ API_DELETE_REBLOG_REGEX) || (req.delete? && req.path =~ API_DELETE_STATUS_REGEX)
+  end
+
+  throttle('protected_paths', limit: 3, period: 360.minutes) do |req|
     req.ip if req.post? && req.path =~ PROTECTED_PATHS_REGEX
   end
 
