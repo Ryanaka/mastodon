@@ -36,8 +36,6 @@ export default class ScrollableList extends PureComponent {
     emptyMessage: PropTypes.node,
     children: PropTypes.node,
     bindToDocument: PropTypes.bool,
-    currentlyViewing: PropTypes.number,
-    updateCurrentlyViewing: PropTypes.func,
   };
 
   static defaultProps = {
@@ -210,10 +208,13 @@ export default class ScrollableList extends PureComponent {
   }
 
   attachIntersectionObserver () {
-    this.intersectionObserverWrapper.connect({
+    let nodeOptions = {
       root: this.node,
       rootMargin: '300% 0px',
-    });
+    };
+
+    this.intersectionObserverWrapper
+      .connect(this.props.bindToDocument ? {} : nodeOptions);
   }
 
   detachIntersectionObserver () {
@@ -295,7 +296,7 @@ export default class ScrollableList extends PureComponent {
           </div>
         </div>
       );
-    } else if (isLoading || childrenCount > 0 || hasMore || !emptyMessage) {
+    } else if (isLoading || childrenCount > 0 || numPending > 0 || hasMore || !emptyMessage) {
       scrollableArea = (
         <div className={classNames('scrollable', { fullscreen })} ref={this.setRef} onMouseMove={this.handleMouseMove}>
           <div role='feed' className='item-list'>
@@ -311,8 +312,6 @@ export default class ScrollableList extends PureComponent {
                 listLength={childrenCount}
                 intersectionObserverWrapper={this.intersectionObserverWrapper}
                 saveHeightKey={trackScroll ? `${this.context.router.route.location.key}:${scrollKey}` : null}
-                currentlyViewing={this.props.currentlyViewing}
-                updateCurrentlyViewing={this.props.updateCurrentlyViewing}
               >
                 {React.cloneElement(child, {
                   getScrollPosition: this.getScrollPosition,
