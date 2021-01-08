@@ -32,7 +32,7 @@ gem 'browser'
 gem 'charlock_holmes', '~> 0.7.7'
 gem 'iso-639'
 gem 'chewy', '~> 5.1'
-gem 'cld3', '~> 3.3.0'
+gem 'cld3', '~> 3.4.1'
 gem 'devise', '~> 4.7'
 gem 'devise-two-factor', '~> 3.1'
 
@@ -64,7 +64,7 @@ gem 'kaminari', '~> 1.2'
 gem 'link_header', '~> 0.0'
 gem 'mime-types', '~> 3.3.1', require: 'mime/types/columnar'
 gem 'nilsimsa', git: 'https://github.com/witgo/nilsimsa', ref: 'fd184883048b922b176939f851338d0a4971a532'
-gem 'nokogiri', '~> 1.10'
+gem 'nokogiri', '~> 1.11'
 gem 'nsa', '~> 0.2'
 gem 'oj', '~> 3.10'
 gem 'ox', '~> 2.14'
@@ -80,7 +80,7 @@ gem 'rails-settings-cached', '~> 0.6'
 gem 'redis', '~> 4.2', require: ['redis', 'redis/connection/hiredis']
 gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
 gem 'rqrcode', '~> 1.2'
-gem 'ruby-progressbar', '~> 1.10'
+gem 'ruby-progressbar', '~> 1.11'
 gem 'sanitize', '~> 5.2'
 gem 'scenic', '~> 1.5'
 gem 'sidekiq', '~> 6.1'
@@ -123,8 +123,8 @@ group :test do
   gem 'microformats', '~> 4.2'
   gem 'rails-controller-testing', '~> 1.0'
   gem 'rspec-sidekiq', '~> 3.1'
-  gem 'simplecov', '~> 0.20', require: false
-  gem 'webmock', '~> 3.10'
+  gem 'simplecov', '~> 0.21', require: false
+  gem 'webmock', '~> 3.11'
   gem 'parallel_tests', '~> 3.4'
   gem 'rspec_junit_formatter', '~> 0.4'
 end
@@ -133,13 +133,13 @@ group :development do
   gem 'active_record_query_trace', '~> 1.8'
   gem 'annotate', '~> 3.1'
   gem 'better_errors', '~> 2.9'
-  gem 'binding_of_caller', '~> 0.7'
+  gem 'binding_of_caller', '~> 1.0'
   gem 'bullet', '~> 6.1'
   gem 'letter_opener', '~> 1.7'
   gem 'letter_opener_web', '~> 1.4'
   gem 'memory_profiler'
   gem 'rubocop', '~> 1.7', require: false
-  gem 'rubocop-rails', '~> 2.8', require: false
+  gem 'rubocop-rails', '~> 2.9', require: false
   gem 'brakeman', '~> 4.10', require: false
   gem 'bundler-audit', '~> 0.7', require: false
 
