@@ -226,6 +226,7 @@ es:
         update_custom_emoji: Actualizar Emoji Personalizado
         update_domain_block: Actualizar el Bloqueo de Dominio
         update_ip_block: Actualizar regla IP
+        update_report: Actualizar informe
         update_status: Actualizar Publicación
         update_user_role: Actualizar Rol
       actions:
@@ -293,6 +294,7 @@ es:
       filter_by_action: Filtrar por acción
       filter_by_user: Filtrar por usuario
       title: Log de auditoría
+      unavailable_instance: "(nombre de dominio no disponible)"
     announcements:
       destroyed_msg: "¡Anuncio eliminado con éxito!"
       edit:
@@ -637,6 +639,7 @@ es:
       report: 'Reportar #%{id}'
       reported_account: Cuenta reportada
       reported_by: Reportado por
+      reported_with_application: Informado a través de la aplicación
       resolved: Resuelto
       resolved_msg: "¡La denuncia se ha resuelto correctamente!"
       skip_to_actions: Ir directamente a las acciones

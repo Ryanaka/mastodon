@@ -8,7 +8,7 @@ RSpec.describe 'Notifications' do
   let(:scopes)  { 'read:notifications write:notifications' }
   let(:headers) { { 'Authorization' => "Bearer #{token.token}" } }
 
-  describe 'GET /api/v2_alpha/notifications', :sidekiq_inline do
+  describe 'GET /api/v2_alpha/notifications', :inline_jobs do
     subject do
       get '/api/v2_alpha/notifications', headers: headers, params: params
     end
@@ -58,6 +58,7 @@ RSpec.describe 'Notifications' do
 
         expect(response).to have_http_status(200)
         expect(body_json_types.uniq).to eq ['mention']
+        expect(body_as_json[0][:page_min_id]).to_not be_nil
       end
     end
 

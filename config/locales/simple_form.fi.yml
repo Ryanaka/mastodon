@@ -83,7 +83,7 @@ fi:
         closed_registrations_message: Näkyy, kun rekisteröityminen on suljettu
         content_cache_retention_period: Kaikki muiden palvelinten julkaisut (mukaan lukien tehostukset ja vastaukset) poistuvat, kun määritetty määrä päiviä on kulunut, ottamatta huomioon paikallisen käyttäjän vuorovaikutusta näiden julkaisujen kanssa. Sisältää julkaisut, jotka paikallinen käyttäjä on merkinnyt kirjanmerkiksi tai suosikiksi. Myös yksityiset maininnat eri palvelinten käyttäjien välillä menetetään, eikä niitä voi palauttaa. Tämä asetus on tarkoitettu käytettäväksi erityistapauksissa ja rikkoo monia käyttäjien odotuksia, kun sitä käytetään yleistarkoituksiin.
         custom_css: Voit käyttää mukautettuja tyylejä Mastodonin verkkoversiossa.
-        favicon: WEBP, PNG, GIF tai JPG. Korvaa oletusarvoisen Mastodonin suosikkikuvakkeen omalla kuvakkeella.
+        favicon: WEBP, PNG, GIF tai JPG. Korvaa oletusarvoisen Mastodonin sivustokuvakkeen (favicon) haluamallasi kuvakkeella.
         mascot: Ohittaa kuvituksen edistyneessä selainkäyttöliittymässä.
         media_cache_retention_period: Käyttäjien tekemien julkaisujen mediatiedostot ovat välimuistissa palvelimellasi. Kun arvo on positiivinen, media poistuu, kun määritetty määrä päiviä on kulunut. Jos mediaa pyydetään sen poistamisen jälkeen, se ladataan uudelleen, jos lähdesisältö on vielä saatavilla. Koska linkkien esikatselun kyselyitä kolmansien osapuolien sivustoille on rajoitettu, on suositeltavaa asettaa tämä arvo vähintään 14 päivään, tai linkkien kortteja ei päivitetä pyynnöstä ennen tätä ajankohtaa.
         peers_api_enabled: Luettelo verkkotunnuksista, jotka tämä palvelin on kohdannut fediversumissa. Se ei kerro, oletko liitossa tietyn palvelimen kanssa, vaan että palvelimesi on ylipäätään tietoinen siitä. Tätä tietoa käytetään palveluissa, jotka keräävät tilastoja federoinnista yleisellä tasolla.
@@ -211,6 +211,7 @@ fi:
         setting_default_privacy: Julkaisun näkyvyys
         setting_default_sensitive: Merkitse media aina arkaluonteiseksi
         setting_delete_modal: Kysy vahvistusta ennen julkaisun poistamista
+        setting_disable_hover_cards: Poista käytöstä profiilin esikatselu osoitettaessa
         setting_disable_swiping: Poista pyyhkäisyeleet käytöstä
         setting_display_media: Median näyttäminen
         setting_display_media_default: Oletus
@@ -242,11 +243,13 @@ fi:
           warn: Piilota varoittaen
       form_admin_settings:
         activity_api_enabled: Julkaise yhteenlasketut tilastot käyttäjätoiminnasta ohjelmointirajapinnassa
+        app_icon: Sovelluskuvake
         backups_retention_period: Käyttäjän arkiston säilytysaika
         bootstrap_timeline_accounts: Suosittele aina näitä tilejä uusille käyttäjille
         closed_registrations_message: Mukautettu viesti, kun rekisteröityminen ei ole saatavilla
         content_cache_retention_period: Etäsisällön säilytysaika
         custom_css: Mukautettu CSS
+        favicon: Suosikkikuvake
         mascot: Mukautettu maskotti (vanhentunut ominaisuus)
         media_cache_retention_period: Mediasisältövälimuistin säilytysaika
         peers_api_enabled: Julkaise löydettyjen palvelinten luettelo ohjelmointirajapinnassa
