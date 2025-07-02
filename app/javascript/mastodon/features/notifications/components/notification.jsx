@@ -18,9 +18,9 @@ import PersonIcon from '@/material-icons/400-24px/person-fill.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
+import { Account } from 'mastodon/components/account';
 import { Icon }  from 'mastodon/components/icon';
-import AccountContainer from 'mastodon/containers/account_container';
-import StatusContainer from 'mastodon/containers/status_container';
+import { StatusQuoteManager } from 'mastodon/components/status_quoted';
 import { me } from 'mastodon/initial_state';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
@@ -31,11 +31,11 @@ import { RelationshipsSeveranceEvent } from './relationships_severance_event';
 import Report from './report';
 
 const messages = defineMessages({
-  favourite: { id: 'notification.favourite', defaultMessage: '{name} favorited your status' },
+  favourite: { id: 'notification.favourite', defaultMessage: '{name} favorited your post' },
   follow: { id: 'notification.follow', defaultMessage: '{name} followed you' },
   ownPoll: { id: 'notification.own_poll', defaultMessage: 'Your poll has ended' },
   poll: { id: 'notification.poll', defaultMessage: 'A poll you voted in has ended' },
-  reblog: { id: 'notification.reblog', defaultMessage: '{name} boosted your status' },
+  reblog: { id: 'notification.reblog', defaultMessage: '{name} boosted your post' },
   status: { id: 'notification.status', defaultMessage: '{name} just posted' },
   update: { id: 'notification.update', defaultMessage: '{name} edited a post' },
   adminSignUp: { id: 'notification.admin.sign_up', defaultMessage: '{name} signed up' },
@@ -147,7 +147,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <AccountContainer id={account.get('id')} hidden={this.props.hidden} />
+          <Account id={account.get('id')} hidden={this.props.hidden} />
         </div>
       </HotKeys>
     );
@@ -167,7 +167,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <FollowRequestContainer id={account.get('id')} withNote={false} hidden={this.props.hidden} />
+          <FollowRequestContainer id={account.get('id')} hidden={this.props.hidden} />
         </div>
       </HotKeys>
     );
@@ -175,7 +175,7 @@ class Notification extends ImmutablePureComponent {
 
   renderMention (notification) {
     return (
-      <StatusContainer
+      <StatusQuoteManager
         id={notification.get('status')}
         withDismiss
         hidden={this.props.hidden}
@@ -201,11 +201,11 @@ class Notification extends ImmutablePureComponent {
             <Icon id='star' icon={StarIcon} className='star-icon' />
 
             <span title={notification.get('created_at')}>
-              <FormattedMessage id='notification.favourite' defaultMessage='{name} favorited your status' values={{ name: link }} />
+              <FormattedMessage id='notification.favourite' defaultMessage='{name} favorited your post' values={{ name: link }} />
             </span>
           </div>
 
-          <StatusContainer
+          <StatusQuoteManager
             id={notification.get('status')}
             account={notification.get('account')}
             muted
@@ -231,11 +231,11 @@ class Notification extends ImmutablePureComponent {
             <Icon id='retweet' icon={RepeatIcon} />
 
             <span title={notification.get('created_at')}>
-              <FormattedMessage id='notification.reblog' defaultMessage='{name} boosted your status' values={{ name: link }} />
+              <FormattedMessage id='notification.reblog' defaultMessage='{name} boosted your post' values={{ name: link }} />
             </span>
           </div>
 
-          <StatusContainer
+          <StatusQuoteManager
             id={notification.get('status')}
             account={notification.get('account')}
             muted
@@ -269,7 +269,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <StatusContainer
+          <StatusQuoteManager
             id={notification.get('status')}
             account={notification.get('account')}
             contextType='notifications'
@@ -304,7 +304,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <StatusContainer
+          <StatusQuoteManager
             id={notification.get('status')}
             account={notification.get('account')}
             contextType='notifications'
@@ -345,7 +345,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <StatusContainer
+          <StatusQuoteManager
             id={notification.get('status')}
             account={account}
             contextType='notifications'
@@ -420,7 +420,7 @@ class Notification extends ImmutablePureComponent {
             </span>
           </div>
 
-          <AccountContainer id={account.get('id')} hidden={this.props.hidden} />
+          <Account id={account.get('id')} hidden={this.props.hidden} />
         </div>
       </HotKeys>
     );

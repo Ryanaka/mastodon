@@ -1,12 +1,17 @@
 // Notes!
 // Sass color functions, "darken" and "lighten" are automatically replaced.
-
-html {
-  scrollbar-color: $ui-base-color rgba($ui-base-color, 0.25);
-}
+@use 'sass:color';
+@use '../mastodon/functions' as *;
+@use '../mastodon/variables' as *;
 
 .simple_form .button.button-tertiary {
   color: $highlight-text-color;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: $white;
+  }
 }
 
 .status-card__actions button,
@@ -52,10 +57,6 @@ html {
   color: darken($action-button-color, 25%);
 }
 
-.account__header__bar .avatar .account__avatar {
-  border-color: $white;
-}
-
 .getting-started__footer a {
   color: $ui-secondary-color;
   text-decoration: underline;
@@ -95,18 +96,6 @@ html {
   color: $white;
 }
 
-.search__input {
-  @media screen and (max-width: $no-gap-breakpoint) {
-    border-top: 0;
-    border-bottom: 0;
-  }
-}
-
-.list-editor .search .search__input {
-  border-top: 0;
-  border-bottom: 0;
-}
-
 .upload-progress__backdrop {
   background: $ui-base-color;
 }
@@ -114,17 +103,6 @@ html {
 // Change the background colors of statuses
 .focusable:focus {
   background: lighten($white, 4%);
-}
-
-// Change the background colors of status__content__spoiler-link
-.reply-indicator__content .status__content__spoiler-link,
-.status__content .status__content__spoiler-link {
-  background: $ui-base-color;
-
-  &:hover,
-  &:focus {
-    background: lighten($ui-base-color, 4%);
-  }
 }
 
 .account-gallery__item a {
@@ -140,9 +118,7 @@ html {
 .actions-modal ul li:not(:empty) a:focus button,
 .actions-modal ul li:not(:empty) a:hover,
 .actions-modal ul li:not(:empty) a:hover button,
-.simple_form .block-button,
-.simple_form .button,
-.simple_form button {
+.simple_form button:not(.button, .link-button) {
   color: $white;
 }
 
@@ -155,26 +131,9 @@ html {
   border-top-color: lighten($ui-base-color, 4%);
 }
 
-// Change the background colors of modals
-.actions-modal,
-.boost-modal,
-.confirmation-modal,
-.mute-modal,
-.block-modal,
-.report-modal,
-.report-dialog-modal,
-.embed-modal,
-.error-modal,
-.onboarding-modal,
-.compare-history-modal,
-.report-modal__comment .setting-text__wrapper,
-.report-modal__comment .setting-text,
-.announcements,
-.picture-in-picture__header,
-.picture-in-picture__footer,
-.reactions-bar__item {
-  background: $white;
-  border: 1px solid var(--background-border-color);
+.dialog-modal__content__preview {
+  background: #fff;
+  border-bottom: 1px solid var(--modal-border-color);
 }
 
 .reactions-bar__item:hover,
@@ -184,8 +143,12 @@ html {
 }
 
 .reactions-bar__item.active {
-  background-color: mix($white, $ui-highlight-color, 80%);
-  border-color: mix(lighten($ui-base-color, 8%), $ui-highlight-color, 80%);
+  background-color: color.mix($white, $ui-highlight-color, 80%);
+  border-color: color.mix(
+    lighten($ui-base-color, 8%),
+    $ui-highlight-color,
+    80%
+  );
 }
 
 .media-modal__overlay .picture-in-picture__footer {
@@ -204,20 +167,6 @@ html {
 .icon-with-badge__badge {
   border-color: $white;
   color: $white;
-}
-
-.report-modal__comment {
-  border-right-color: lighten($ui-base-color, 8%);
-}
-
-.report-modal__container {
-  border-top-color: lighten($ui-base-color, 8%);
-}
-
-.column-header__collapsible-inner {
-  background: darken($ui-base-color, 4%);
-  border: 1px solid var(--background-border-color);
-  border-bottom: 0;
 }
 
 .column-settings__hashtags .column-select__option {
@@ -288,7 +237,7 @@ html {
 
 // Change the default colors used on some parts of the profile pages
 .activity-stream-tabs {
-  background: $account-background-color;
+  background: $white;
   border-bottom-color: lighten($ui-base-color, 8%);
 }
 
@@ -298,12 +247,6 @@ html {
 .directory__tag > div {
   background: $white;
   border: 1px solid var(--background-border-color);
-
-  @media screen and (max-width: $no-gap-breakpoint) {
-    border-left: 0;
-    border-right: 0;
-    border-top: 0;
-  }
 }
 
 .picture-in-picture-placeholder {
@@ -318,10 +261,6 @@ html {
   &:focus {
     background: $ui-base-color;
   }
-
-  @media screen and (max-width: $no-gap-breakpoint) {
-    border: 0;
-  }
 }
 
 .batch-table {
@@ -329,36 +268,6 @@ html {
   &__row,
   .nothing-here {
     border-color: lighten($ui-base-color, 8%);
-  }
-}
-
-.activity-stream {
-  border: 1px solid var(--background-border-color);
-
-  &--under-tabs {
-    border-top: 0;
-  }
-
-  .entry {
-    background: $account-background-color;
-
-    .detailed-status.light,
-    .more.light,
-    .status.light {
-      border-bottom-color: lighten($ui-base-color, 8%);
-    }
-  }
-
-  .status.light {
-    .status__content {
-      color: $primary-text-color;
-    }
-
-    .display-name {
-      strong {
-        color: $primary-text-color;
-      }
-    }
   }
 }
 
@@ -438,9 +347,6 @@ html {
   border-color: transparent transparent $white;
 }
 
-.hero-widget,
-.moved-account-widget,
-.memoriam-widget,
 .activity-stream,
 .nothing-here,
 .directory__tag > a,
@@ -466,13 +372,6 @@ html {
       }
     }
   }
-}
-
-.mute-modal select {
-  border: 1px solid var(--background-border-color);
-  background: $simple-background-color
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.933 18.467' height='19.698' width='15.929'><path d='M3.467 14.967l-3.393-3.5H14.86l-3.392 3.5c-1.866 1.925-3.666 3.5-4 3.5-.335 0-2.135-1.575-4-3.5zm.266-11.234L7.467 0 11.2 3.733l3.733 3.734H0l3.733-3.734z' fill='#{hex-color(lighten($ui-base-color, 8%))}'/></svg>")
-    no-repeat right 8px center / auto 16px;
 }
 
 .status__wrapper-direct {
@@ -504,15 +403,33 @@ html {
   color: lighten($ui-highlight-color, 8%);
 }
 
-.compose-form .autosuggest-textarea__textarea,
-.compose-form__highlightable,
-.search__input,
-.search__popout,
 .emoji-mart-search input,
 .language-dropdown__dropdown .emoji-mart-search input,
-// .strike-card,
 .poll__option input[type='text'] {
   background: darken($ui-base-color, 10%);
+}
+
+.dropdown-button.warning {
+  border-color: #b3261e;
+  color: #b3261e;
+
+  &.active {
+    background-color: #f9dedc;
+  }
+}
+
+.search__popout__menu__item {
+  &:hover,
+  &:active,
+  &:focus,
+  &.active {
+    color: $white;
+
+    mark,
+    .icon-button {
+      color: $white;
+    }
+  }
 }
 
 .inline-follow-suggestions {
@@ -565,5 +482,39 @@ a.sparkline {
   &:focus,
   &:active {
     background: darken($ui-base-color, 10%);
+  }
+}
+
+.setting-text {
+  background: darken($ui-base-color, 10%);
+}
+
+.report-dialog-modal__textarea {
+  background: darken($ui-base-color, 10%);
+}
+
+.autosuggest-account {
+  .display-name__account {
+    color: $dark-text-color;
+  }
+}
+
+.notification-group--annual-report {
+  .notification-group__icon,
+  .notification-group__main .link-button {
+    color: var(--indigo-3);
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: rgba($action-button-color, 0.25)
+      var(--background-border-color);
+  }
+}
+
+.custom-scrollbars {
+  ::-webkit-scrollbar-thumb {
+    opacity: 0.25;
   }
 }

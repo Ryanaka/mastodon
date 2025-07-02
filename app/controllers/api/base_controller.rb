@@ -30,10 +30,10 @@ class Api::BaseController < ApplicationController
 
   protected
 
-  def limit_param(default_limit)
+  def limit_param(default_limit, max_limit = nil)
     return default_limit unless params[:limit]
 
-    [params[:limit].to_i.abs, default_limit * 2].min
+    [params[:limit].to_i.abs, max_limit || (default_limit * 2)].min
   end
 
   def params_slice(*keys)
@@ -48,6 +48,10 @@ class Api::BaseController < ApplicationController
     current_resource_owner || super
   rescue ActiveRecord::RecordNotFound
     nil
+  end
+
+  def require_client_credentials!
+    render json: { error: 'This method requires an client credentials authentication' }, status: 403 if doorkeeper_token.resource_owner_id.present?
   end
 
   def require_authenticated_user!
@@ -72,6 +76,13 @@ class Api::BaseController < ApplicationController
     end
   end
 
+  # Redefine `require_functional!` to properly output JSON instead of HTML redirects
+  def require_functional!
+    return if current_user.functional?
+
+    require_user!
+  end
+
   def render_empty
     render json: {}, status: 200
   end
@@ -81,7 +92,7 @@ class Api::BaseController < ApplicationController
   end
 
   def disallow_unauthenticated_api_access?
-    ENV['DISALLOW_UNAUTHENTICATED_API_ACCESS'] == 'true' || Rails.configuration.x.limited_federation_mode
+    ENV['DISALLOW_UNAUTHENTICATED_API_ACCESS'] == 'true' || Rails.configuration.x.mastodon.limited_federation_mode
   end
 
   private
