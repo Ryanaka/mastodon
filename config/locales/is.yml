@@ -7,6 +7,8 @@ is:
     hosted_on: Mastodon hýst á %{domain}
     title: Um hugbúnaðinn
   accounts:
+    errors:
+      cannot_be_added_to_collections: Þessum aðgangi er ekki hægt að bæta í söfn.
     followers:
       one: fylgjandi
       other: fylgjendur
@@ -848,6 +850,7 @@ is:
         publish_statistics: Birta tölfræði
         title: Uppgötvun
         trends: Vinsælt
+        wrapstodon: Ársuppgjörið
       domain_blocks:
         all: Til allra
         disabled: Til engra
@@ -1320,6 +1323,13 @@ is:
     hint_html: "<strong>Ábending:</strong> Við munum ekki spyrja þig um lykilorðið aftur næstu klukkustundina."
     invalid_password: Ógilt lykilorð
     prompt: Staðfestu lykilorðið til að halda áfram
+  color_scheme:
+    auto: Sjálfvirkt
+    dark: Dökkt
+    light: Ljóst
+  contrast:
+    auto: Sjálfvirkt
+    high: Mikið
   crypto:
     errors:
       invalid_key: er ekki gildur Ed25519 eða Curve25519-lykill
@@ -1676,7 +1686,7 @@ is:
       disabled_account: Núverandi aðgangur þinn verður ekki nothæfur að fullu eftir þetta. Hinsvegar muntu geta flutt út gögn af honum og einnig endurvirkjað hann.
       followers: Þessi aðgerð mun flytja alla fylgjendur af núverandi aðgangi yfir á nýja aðganginn
       only_redirect_html: Einnig geturðu <a href="%{path}">einungis sett upp endurbeiningu á notandasniðið þitt</a>.
-      other_data: Engin önnur gögn munu flytjast sjálfvirkt
+      other_data: Engin önnur gögn verða flutt sjálfkrafa (m.a. færslurnar þínar og listar yfir þá sem þú fylgist með)
       redirect: Notandasnið aðgangsins verður uppfært með athugasemd um endurbeininguna og verður undanþegið frá leitum
   moderation:
     title: Umsjón
@@ -1710,16 +1720,22 @@ is:
       body: "%{name} minntist á þig í:"
       subject: "%{name} minntist á þig"
       title: Ný tilvísun
+    moderation_warning:
+      subject: Þú hefur fengið aðvörun frá umsjónarmanni
     poll:
       subject: Könnun frá %{name} er lokið
     quote:
       body: "%{name} vitnaði í færsluna þína:"
       subject: "%{name} vitnaði í færsluna þína"
       title: Ný tilvitnun
+    quoted_update:
+      subject: "%{name} breytti færslu sem þú hefur vitnað í"
     reblog:
       body: "%{name} endurbirti færsluna þína:"
       subject: "%{name} endurbirti færsluna þína"
       title: Ný endurbirting
+    severed_relationships:
+      subject: Þú hefur tapað tengingum vegna ákvörðunar umsjónarmanna
     status:
       subject: "%{name} sendi inn rétt í þessu"
     update:
@@ -1933,6 +1949,7 @@ is:
     errors:
       in_reply_not_found: Færslan sem þú ert að reyna að svara að er líklega ekki til.
       quoted_status_not_found: Færslan sem þú ert að reyna að vitna í virðist ekki vera til.
+      quoted_user_not_mentioned: Ekki er hægt að vitna í aðila sem ekki er minnst á í einkaspjalli.
     over_character_limit: hámarksfjölda stafa (%{max}) náð
     pin_errors:
       direct: Ekki er hægt að festa færslur sem einungis eru sýnilegar þeim notendum sem minnst er á
@@ -2182,3 +2199,6 @@ is:
     not_supported: Þessi vafri styður ekki öryggislykla
     otp_required: Til að nota öryggislykla skaltu fyrst virkja tveggja-þátta auðkenningu.
     registered_on: Skráði sig %{date}
+  wrapstodon:
+    description: Sjáðu hvernig %{name} notaði Mastodon á árinu!
+    title: Ársuppgjörið %{year} fyrir %{name}
