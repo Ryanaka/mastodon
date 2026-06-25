@@ -12,6 +12,7 @@ class ActivityPub::LinkedDataSignature
 
   def verify_actor!
     return unless @json['signature'].is_a?(Hash)
+    return if unsupported_jsonld_features?(@json)
 
     type        = @json['signature']['type']
     creator_uri = @json['signature']['creator']
@@ -21,7 +22,7 @@ class ActivityPub::LinkedDataSignature
 
     keypair = Keypair.from_keyid(creator_uri)
     keypair = ActivityPub::FetchRemoteKeyService.new.call(creator_uri) if keypair&.public_key.blank?
-    return if keypair.nil? || !keypair.usable?
+    return if keypair.nil? || !keypair.usable? || keypair.type != 'rsa'
 
     options_hash   = hash(@json['signature'].without('type', 'id', 'signatureValue').merge('@context' => CONTEXT))
     document_hash  = hash(@json.without('signature'))
