@@ -262,6 +262,7 @@ zh-TW:
         setting_missing_alt_text_modal: 於發出未含有 ALT 說明文字之嘟文前警告我
         setting_quick_boosting: 啟用快速轉嘟
         setting_reduce_motion: 減少過渡動畫效果
+        setting_split_default_privacy_discoverable: 使我的嘟文於公開時間軸與搜尋結果中可見
         setting_system_font_ui: 使用系統預設字型
         setting_system_scrollbars_ui: 使用系統預設捲動軸
         setting_theme: 佈景主題
@@ -344,6 +345,7 @@ zh-TW:
       notification_emails:
         appeal: 有人對管理員的決定提出上訴
         digest: 傳送摘要電子郵件
+        end_of_support: 目前正在運行之 Mastodon 版本即將停止支援
         favourite: 當有使用者將您的嘟文加入最愛時，傳送電子郵件通知
         follow: 當有使用者跟隨您時，傳送電子郵件通知
         follow_request: 當有使用者請求跟隨您時，傳送電子郵件通知

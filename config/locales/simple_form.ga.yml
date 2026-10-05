@@ -266,6 +266,7 @@ ga:
         setting_missing_alt_text_modal: Tabhair rabhadh dom sula bpostálann tú meáin gan téacs malartach
         setting_quick_boosting: Cumasaigh borradh tapa
         setting_reduce_motion: Laghdú ar an tairiscint i beochan
+        setting_split_default_privacy_discoverable: Déan mo chuid postálacha in-aimsithe sa bhfuilseán poiblí agus i dtorthaí cuardaigh
         setting_system_font_ui: Úsáid cló réamhshocraithe an chórais
         setting_system_scrollbars_ui: Bain úsáid as scrollbharra réamhshocraithe an chórais
         setting_theme: Téama suímh
@@ -348,6 +349,7 @@ ga:
       notification_emails:
         appeal: Déanann duine éigin achomharc i gcoinne chinneadh modhnóra
         digest: Seol r-phoist achoimre
+        end_of_support: Tá an leagan reatha Mastodon ag druidim le deireadh na tacaíochta
         favourite: Is fearr le duine éigin do phostáil
         follow: Lean duine éigin tú
         follow_request: D'iarr duine éigin tú a leanúint

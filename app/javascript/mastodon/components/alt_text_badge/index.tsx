@@ -4,21 +4,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
-import type {
-  OffsetValue,
-  UsePopperOptions,
-} from 'react-overlays/esm/usePopper';
-import Overlay from 'react-overlays/Overlay';
-
+import { useSelectableClick } from '@/mastodon/hooks/useSelectableClick';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-import { useSelectableClick } from 'mastodon/hooks/useSelectableClick';
 
+import { Button } from '../button/redesign';
 import { IconButton } from '../icon_button';
+import { Popover } from '../popover';
 
 import classes from './styles.module.scss';
-
-const offset = [0, 4] as OffsetValue;
-const popperConfig = { strategy: 'fixed' } as UsePopperOptions;
 
 export const AltTextBadge: React.FC<{
   description: string;
@@ -28,7 +22,9 @@ export const AltTextBadge: React.FC<{
   const uniqueId = useId();
   const popoverId = `${uniqueId}-popover`;
   const titleId = `${uniqueId}-title`;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonElement, setButtonElement] = useState<HTMLButtonElement | null>(
+    null,
+  );
   const popoverRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -41,16 +37,20 @@ export const AltTextBadge: React.FC<{
 
   const handleClose = useCallback(() => {
     setOpen(false);
-    buttonRef.current?.focus();
-  }, [setOpen]);
+    buttonElement?.focus();
+  }, [buttonElement]);
 
   const [handleMouseDown, handleMouseUp] = useSelectableClick(handleClose);
 
+  const ButtonComp = isRedesignEnabled() ? Button : 'button';
+
   return (
     <>
-      <button
+      <ButtonComp
+        size='xs'
         type='button'
-        ref={buttonRef}
+        variant='solid'
+        ref={setButtonElement}
         className={classNames('media-gallery__alt__label', className)}
         onClick={handleClick}
         aria-expanded={open}
@@ -58,22 +58,23 @@ export const AltTextBadge: React.FC<{
         aria-haspopup='dialog'
       >
         ALT
-      </button>
+      </ButtonComp>
 
-      <Overlay
-        rootClose
-        onHide={handleClose}
-        show={open}
-        target={buttonRef as React.RefObject<HTMLButtonElement>}
+      <Popover
+        isOpen={open}
+        onClose={handleClose}
+        reference={buttonElement}
         placement='top-end'
-        flip
-        offset={offset}
-        popperConfig={popperConfig}
+        offset={4}
       >
         {({ props }) => (
           <div {...props} className='hover-card-controller'>
             <div // eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
-              className='info-tooltip dropdown-animation'
+              className={classNames(
+                'info-tooltip',
+                'dropdown-animation',
+                isRedesignEnabled() && classes.redesignPopover,
+              )}
               role='dialog'
               aria-labelledby={titleId}
               ref={popoverRef}
@@ -105,7 +106,7 @@ export const AltTextBadge: React.FC<{
             </div>
           </div>
         )}
-      </Overlay>
+      </Popover>
     </>
   );
 };

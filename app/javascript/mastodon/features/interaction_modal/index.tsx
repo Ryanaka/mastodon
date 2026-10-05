@@ -26,8 +26,6 @@ const messages = defineMessages({
   },
 });
 
-type InteractionIntent = 'follow' | 'reblog' | 'favourite' | 'reply' | 'vote';
-
 interface LoginFormMessage {
   type:
     | 'fetchInteractionURL'
@@ -36,7 +34,7 @@ interface LoginFormMessage {
   uri_or_domain: string;
   template?: string;
   param?: string;
-  intent?: InteractionIntent;
+  intent?: string;
 }
 
 const PERSISTENCE_KEY = 'mastodon_home';
@@ -366,7 +364,6 @@ const LoginForm: React.FC<{
           aria-label={intl.formatMessage(messages.loginPrompt, {
             example: EXAMPLE_VALUE,
           })}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
           onChange={handleChange}
           onFocus={handleFocus}

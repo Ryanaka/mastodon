@@ -15,6 +15,7 @@ import { throttle } from 'lodash';
 
 import { determineEmojiMode } from '@/mastodon/features/emoji/mode';
 import { updateHtmlWithEmoji } from '@/mastodon/features/emoji/render';
+import type { InitialState } from '@/mastodon/initial_state';
 import loadKeyboardExtensions from '@/mastodon/load_keyboard_extensions';
 import { loadLocale, getLocale } from '@/mastodon/locales';
 import { loadPolyfills } from '@/mastodon/polyfills';
@@ -83,7 +84,7 @@ async function loaded() {
     document.getElementById('initial-state')?.textContent;
   if (initialStateText) {
     const stateEmojiStyle = getNestedProperty(
-      JSON.parse(initialStateText) as unknown,
+      JSON.parse(initialStateText) as InitialState,
       'meta',
       'emoji_style',
     );
@@ -177,6 +178,10 @@ async function loaded() {
 
   updateDefaultQuotePrivacyFromPrivacy(
     document.querySelector('#user_settings_attributes_default_privacy'),
+  );
+
+  updateDefaultDiscoverableFromPrivacy(
+    document.querySelector('#user_settings_attributes_split_default_privacy'),
   );
 
   truncateRuleHints();
@@ -443,6 +448,71 @@ on('change', '#user_settings_attributes_default_privacy', ({ target }) => {
   updateDefaultQuotePrivacyFromPrivacy(target);
 });
 
+const updateDefaultDiscoverableFromPrivacy = (
+  privacySelect: EventTarget | null,
+) => {
+  if (!(privacySelect instanceof HTMLSelectElement) || !privacySelect.form)
+    return;
+
+  const checkbox = privacySelect.form.querySelector<HTMLInputElement>(
+    'input#user_settings_attributes_split_default_privacy_discoverable',
+  );
+  if (!checkbox) return;
+
+  if (privacySelect.value === 'private') {
+    checkbox.checked = false;
+  }
+
+  setInputDisabled(checkbox, privacySelect.value === 'private');
+};
+
+on(
+  'change',
+  '#user_settings_attributes_split_default_privacy',
+  ({ target }) => {
+    updateDefaultDiscoverableFromPrivacy(target);
+  },
+);
+
+const updateDefaultQuotePrivacyFromSplitPrivacy = () => {
+  const privacySelect = document.querySelector<HTMLSelectElement>(
+    'select#user_settings_attributes_split_default_privacy',
+  );
+  if (!(privacySelect instanceof HTMLSelectElement) || !privacySelect.form)
+    return;
+
+  const discoverableCheckbox = document.querySelector<HTMLInputElement>(
+    'input#user_settings_attributes_split_default_privacy_discoverable',
+  );
+  if (!discoverableCheckbox) return;
+
+  const select = privacySelect.form.querySelector<HTMLSelectElement>(
+    'select#user_settings_attributes_default_quote_policy',
+  );
+  if (!select) return;
+
+  let privacy = privacySelect.value;
+  if (privacy === 'public' && !discoverableCheckbox.checked)
+    privacy = 'unlisted';
+
+  setInputHint(select, privacy);
+
+  if (privacySelect.value === 'private') {
+    select.value = 'nobody';
+    setInputDisabled(select, true);
+  } else {
+    setInputDisabled(select, false);
+  }
+};
+
+on(
+  'change',
+  '#user_settings_attributes_split_default_privacy,#user_settings_attributes_split_default_privacy_discoverable',
+  () => {
+    updateDefaultQuotePrivacyFromSplitPrivacy();
+  },
+);
+
 // Empty the honeypot fields in JS in case something like an extension
 // automatically filled them.
 on('submit', '#registration_new_user,#new_user', () => {
@@ -522,14 +592,6 @@ on('click', '.rules-list button', ({ target }) => {
  * don't produce accessible markup (simple-forms & simple-navigation)
  */
 function applyRailsA11yPatches() {
-  /**
-   * Mark current navigation item with aria-current
-   */
-  const activeNavLink = document.querySelector(
-    '.simple-navigation-active-leaf a.selected',
-  );
-  activeNavLink?.setAttribute('aria-current', 'page');
-
   /**
    * Hides the asterisk added to labels of required form fields
    * from assistive tech. (Those fields already have the `required` attribute)

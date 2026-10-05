@@ -43,6 +43,7 @@
 #  private_key                   :text
 #  protocol                      :integer          default("ostatus"), not null
 #  public_key                    :text             default(""), not null
+#  requested_deletion_at         :datetime
 #  requested_review_at           :datetime
 #  reviewed_at                   :datetime
 #  sensitized_at                 :datetime
@@ -54,7 +55,7 @@
 #  suspended_at                  :datetime
 #  suspension_origin             :integer
 #  trendable                     :boolean
-#  uri                           :string           default(""), not null
+#  uri                           :string
 #  url                           :string
 #  username                      :string           default(""), not null
 #  created_at                    :datetime         not null
@@ -63,8 +64,6 @@
 #
 
 class Account < ApplicationRecord
-  self.ignored_columns += %w(devices_url)
-
   BACKGROUND_REFRESH_INTERVAL = 1.week.freeze
   REFRESH_DEADLINE = 6.hours
   STALE_THRESHOLD = 1.day
@@ -110,6 +109,7 @@ class Account < ApplicationRecord
   include DomainNormalizable
   include Paginable
   include Reviewable
+  include AuthorizedFetchHelper
 
   enum :protocol, { ostatus: 0, activitypub: 1 }
   enum :suspension_origin, { local: 0, remote: 1 }, prefix: true
@@ -122,7 +122,8 @@ class Account < ApplicationRecord
   validates :username, format: { with: USERNAME_ONLY_RE }, length: { maximum: USERNAME_LENGTH_HARD_LIMIT }, if: -> { (remote? || actor_type_application?) && will_save_change_to_username? }
 
   # Remote user validations
-  validates :uri, presence: true, unless: :local?, on: :create
+  validates :uri, presence: true, exclusion: { in: [''] }, uniqueness: true, unless: :local?, on: :create
+  validates :inbox_url, presence: true, if: -> { !local? && (new_record? || will_save_change_to_inbox_url?) }
 
   # Local user validations
   validates :username, format: { with: /\A[a-z0-9_]+\z/i }, length: { maximum: USERNAME_LENGTH_LIMIT }, if: -> { local? && will_save_change_to_username? && !actor_type_application? }
@@ -136,7 +137,7 @@ class Account < ApplicationRecord
     validates :following_url, absence: true
     validates :inbox_url, absence: true
     validates :shared_inbox_url, absence: true
-    validates :uri, absence: true
+    validates :uri, absence: true, exclusion: { in: [''] }
   end
 
   validates :domain, exclusion: { in: [''] }
@@ -237,7 +238,17 @@ class Account < ApplicationRecord
     local? ? username : "#{username}@#{domain}"
   end
 
+  def pretty_username
+    # Return special username for user-facing invalid handle accounts
+    return id.to_s if invalidated_username?
+
+    username
+  end
+
   def pretty_acct
+    # Return special handle for user-facing invalid handle accounts
+    return "#{id}@handle.invalid" if invalidated_username?
+
     local? ? username : "#{username}@#{Addressable::IDNA.to_unicode(domain)}"
   end
 
@@ -253,14 +264,31 @@ class Account < ApplicationRecord
     "acct:#{local_username_and_domain}"
   end
 
+  def invalidate_username!
+    raise ArgumentError if local?
+    return if invalidated_username?
+
+    # It is very unlikely that we will allow `!` in usernames in the future,
+    # and we will never allow ` ` in them either, so this ensure this will never
+    # match a valid username on a remote server.
+
+    # Using the local ID ensures we won't have any conflict.
+
+    update_attribute(:username, "! #{id}")
+  end
+
+  def invalidated_username?
+    username.start_with?('! ')
+  end
+
   def possibly_stale?
-    last_webfingered_at.nil? || last_webfingered_at <= STALE_THRESHOLD.ago
+    last_webfingered_at.nil? || last_webfingered_at <= STALE_THRESHOLD.ago || invalidated_username?
   end
 
   def needs_background_refresh?
     return false if local?
 
-    return true if last_webfingered_at.blank? || last_webfingered_at <= BACKGROUND_REFRESH_INTERVAL.ago
+    return true if last_webfingered_at.blank? || last_webfingered_at <= BACKGROUND_REFRESH_INTERVAL.ago || invalidated_username?
 
     # TODO: Remove some time after 4.6
     # This is temporary workaround to speed up account refreshs after
@@ -285,6 +313,25 @@ class Account < ApplicationRecord
     ResolveAccountService.new.call(acct) unless local?
   end
 
+  def deleted?
+    requested_deletion_at.present? && !instance_actor?
+  end
+
+  def permanently_deleted?
+    deleted? && deletion_request.nil?
+  end
+
+  def mark_deleted!(date: Time.now.utc)
+    transaction do
+      create_deletion_request!
+      update!(requested_deletion_at: date)
+    end
+
+    # This terminates all connections for the given account with the streaming
+    # server:
+    redis.publish("timeline:system:#{id}", { event: :kill }.to_json) if local?
+  end
+
   def memorialize!
     update!(memorial: true)
   end
@@ -301,8 +348,22 @@ class Account < ApplicationRecord
     strikes.where(overruled_at: nil).count
   end
 
-  def keypair
-    @keypair ||= OpenSSL::PKey::RSA.new(private_key || public_key)
+  def keypair(type: nil)
+    # Pick the first (oldest) keypair matching the expected type,
+    # as we can expect our key rotation code to add stand-by keys with higher IDs
+    # before pruning older keys with lower IDs after some time.
+
+    scope = keypairs.usable.order(id: :asc)
+    scope = scope.where(type: type) if type.present?
+
+    case type
+    when :rsa, nil
+      # The legacy key is always RSA, so only fallback
+      # when no other type is requested
+      scope.first || Keypair.from_legacy_account(self)
+    else
+      scope.first
+    end
   end
 
   def tags_as_strings=(tag_names)
@@ -472,11 +533,12 @@ class Account < ApplicationRecord
   end
 
   before_validation :prepare_contents, if: :local?
+  before_create :prepare_reach_filter, if: :local?
   before_create :generate_keys
   before_destroy :clean_feed_manager
 
   def ensure_keys!
-    return unless local? && private_key.blank? && public_key.blank?
+    return unless local? && private_key.blank? && public_key.blank? && keypairs.empty?
 
     generate_keys
     save!
@@ -490,17 +552,22 @@ class Account < ApplicationRecord
 
   private
 
+  def prepare_reach_filter
+    return if instance_actor?
+
+    build_reach_filter if actors_require_signature?
+  end
+
   def prepare_contents
     display_name&.strip!
     note&.strip!
   end
 
   def generate_keys
-    return unless local? && private_key.blank? && public_key.blank?
+    return unless local? && private_key.blank? && public_key.blank? && keypairs.empty?
 
     keypair = OpenSSL::PKey::RSA.new(2048)
-    self.private_key = keypair.to_pem
-    self.public_key  = keypair.public_key.to_pem
+    keypairs << keypairs.build(local_fragment: "#rsa-#{SecureRandom.hex(8)}", type: :rsa, public_key: keypair.public_key.to_pem, private_key: keypair.to_pem)
   end
 
   def normalize_domain

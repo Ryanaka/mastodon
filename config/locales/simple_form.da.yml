@@ -263,6 +263,7 @@ da:
         setting_missing_alt_text_modal: Advar mig, før medier uden alternativ tekst lægges op
         setting_quick_boosting: Aktivér hurtig fremhævelse
         setting_reduce_motion: Reducér animationsbevægelse
+        setting_split_default_privacy_discoverable: Gør mine indlæg tilgængelige i offentligt feed og i søgeresultater
         setting_system_font_ui: Brug systemets standardskrifttype
         setting_system_scrollbars_ui: Brug standard systemrullebjælke
         setting_theme: Webstedstema
@@ -345,6 +346,7 @@ da:
       notification_emails:
         appeal: En moderatorafgørelse er appelleret
         digest: Send resumé e-mails
+        end_of_support: Understøttelsen af den nuværende version af Mastodon ophører snart
         favourite: Nogen favoritmarkerede dit indlæg
         follow: Nogen begyndte at følge dig
         follow_request: Nogen anmodede om at følge dig

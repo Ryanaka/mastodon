@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { CopyIconButton } from '@/mastodon/components/copy_button';
+import { CopyIconButtonLegacy } from '@/mastodon/components/copy_button';
 
 import classes from './copy_link_field.module.scss';
 import { FormFieldWrapper } from './form_field_wrapper';
@@ -22,7 +22,17 @@ interface CopyLinkFieldProps extends CommonFieldWrapperProps, TextInputProps {
 
 export const CopyLinkField = forwardRef<HTMLInputElement, CopyLinkFieldProps>(
   (
-    { id, label, hint, status, value, required, className, ...otherProps },
+    {
+      id,
+      label,
+      hint,
+      status,
+      value,
+      required,
+      className,
+      wrapperClassName,
+      ...otherProps
+    },
     ref,
   ) => {
     const intl = useIntl();
@@ -50,6 +60,7 @@ export const CopyLinkField = forwardRef<HTMLInputElement, CopyLinkFieldProps>(
         required={required}
         status={status}
         inputId={id}
+        className={wrapperClassName}
       >
         {(inputProps) => (
           <div className={classes.wrapper}>
@@ -62,7 +73,7 @@ export const CopyLinkField = forwardRef<HTMLInputElement, CopyLinkFieldProps>(
               onFocus={handleFocus}
               className={classNames(className, classes.input)}
             />
-            <CopyIconButton
+            <CopyIconButtonLegacy
               value={value}
               title={intl.formatMessage({
                 id: 'copy_icon_button.copy_this_text',

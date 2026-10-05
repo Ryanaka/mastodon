@@ -262,6 +262,7 @@ vi:
         setting_missing_alt_text_modal: Hỏi trước khi đăng phương tiện mà không có văn bản thay thế
         setting_quick_boosting: Đăng lại nhanh
         setting_reduce_motion: Giảm chuyển động ảnh GIF
+        setting_split_default_privacy_discoverable: Cho phép tìm thấy trong các nguồn tin công khai & kết quả tìm kiếm
         setting_system_font_ui: Phông chữ mặc định hệ thống
         setting_system_scrollbars_ui: Thanh cuộn mặc định hệ thống
         setting_theme: Giao diện
@@ -344,6 +345,7 @@ vi:
       notification_emails:
         appeal: Ai đó khiếu nại kiểm duyệt
         digest: Gửi email định kỳ
+        end_of_support: Phiên bản Mastodon hiện tại sắp kết thúc hỗ trợ
         favourite: Ai đó thích tút của bạn
         follow: Ai đó theo dõi bạn
         follow_request: Ai đó yêu cầu theo dõi bạn

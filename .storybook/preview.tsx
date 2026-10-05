@@ -8,7 +8,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
 import type { Preview } from '@storybook/react-vite';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { mswLoader } from 'msw-storybook-addon/csf3';
+import { setupWorker } from 'msw/browser';
 import { action } from 'storybook/actions';
 
 import {
@@ -26,16 +27,6 @@ import { modes } from './modes';
 
 import '../app/javascript/styles/application.scss';
 import './styles.css';
-
-// Disabling locales in Storybook as it's breaking with Vite 8.
-// const localeFiles = import.meta.glob('@/mastodon/locales/*.json', {
-//   query: { as: 'json' },
-// });
-
-// Initialize MSW
-initialize({
-  onUnhandledRequest: unhandledRequestHandler,
-});
 
 const preview: Preview = {
   // Auto-generate docs: https://storybook.js.org/docs/writing-docs/autodocs
@@ -84,7 +75,7 @@ const preview: Preview = {
       // Get the locale from the global toolbar
       // and merge it with any parameters or args state.
       const { locale } = globals as { locale: string };
-      const { state = {} } = parameters;
+      const { state = {}, stateFn } = parameters;
 
       const argsState: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(args)) {
@@ -106,13 +97,24 @@ const preview: Preview = {
         }
       }
 
+      let stateFnState: Record<string, unknown> = {};
+      if (typeof stateFn === 'function') {
+        stateFnState =
+          (
+            stateFn as (
+              args: Record<string, unknown>,
+            ) => Record<string, unknown> | undefined | null
+          )(args) ?? {};
+      }
+
       const reducer = reducerWithInitialState(
         {
           meta: {
             locale,
           },
         },
-        state as Record<string, unknown>,
+        state,
+        stateFnState,
         argsState,
       );
 
@@ -159,7 +161,7 @@ const preview: Preview = {
     (Story, { globals }) => {
       const theme = globals.theme;
       useEffect(() => {
-        document.body.setAttribute('data-color-scheme', theme);
+        document.documentElement.dataset.colorScheme = theme;
       }, [theme]);
       return <Story />;
     },
@@ -193,9 +195,25 @@ const preview: Preview = {
         </IdentityContext.Provider>
       );
     },
+    (Story, { parameters }) => {
+      useEffect(() => {
+        document.documentElement.dataset.redesign = parameters.redesign
+          ? 'true'
+          : 'false';
+      }, [parameters.redesign]);
+      return <Story />;
+    },
   ],
   loaders: [
-    mswLoader,
+    mswLoader(async () => {
+      const worker = setupWorker();
+
+      await worker.start({
+        onUnhandledRequest: unhandledRequestHandler,
+      });
+
+      return worker;
+    }),
     importCustomEmojiData,
     importLegacyShortcodes,
     ({ globals: { locale } }) => importEmojiData(locale),

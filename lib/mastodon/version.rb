@@ -9,15 +9,15 @@ module Mastodon
     end
 
     def minor
-      7
+      8
     end
 
     def patch
-      1
+      0
     end
 
     def default_prerelease
-      'alpha.1'
+      'alpha.3'
     end
 
     def prerelease
@@ -45,7 +45,7 @@ module Mastodon
 
     def api_versions
       {
-        mastodon: 11,
+        mastodon: 12,
       }
     end
 

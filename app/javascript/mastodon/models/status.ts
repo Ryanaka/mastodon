@@ -1,8 +1,18 @@
 import type { RecordOf } from 'immutable';
 
+import type { Simplify } from 'type-fest';
+
 import type { ApiCollectionJSON } from '@/mastodon/api_types/collections';
 import type { ApiCustomEmojiJSON } from '@/mastodon/api_types/custom_emoji';
-import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
+import type {
+  ApiAudioAttachmentJSON,
+  ApiGifvAttachmentJSON,
+  ApiImageAttachmentJSON,
+  ApiMediaAttachmentJSON,
+  ApiUnknownAttachmentJSON,
+  ApiVideoAttachmentJSON,
+  MediaAttachmentType,
+} from '@/mastodon/api_types/media_attachments';
 import type {
   ApiQuoteJSON,
   ApiQuotePolicyJSON,
@@ -17,6 +27,8 @@ import type {
   StatusVisibility,
 } from '@/mastodon/api_types/statuses';
 
+import type { AccountShapeFull } from './account';
+
 export type { StatusVisibility } from '@/mastodon/api_types/statuses';
 
 // Temporary until we type it correctly
@@ -27,7 +39,7 @@ export interface StatusShape {
   account: string;
   created_at: string;
   edited_at?: string;
-  application: {
+  application?: {
     name: string;
     website?: string;
   };
@@ -35,11 +47,12 @@ export interface StatusShape {
   language: string;
   muted: boolean;
   pinned: boolean;
-  filtered: FilterResult[];
+  filtered?: FilterResult[];
   sensitive: boolean;
-  collapsed: boolean;
+  collapsed: boolean | null;
   uri: string;
   url: string | null;
+  isLoading?: boolean;
 
   // Content
   content: string;
@@ -56,9 +69,7 @@ export interface StatusShape {
   media_attachments: MediaAttachmentShape[];
   mentions: ApiMentionJSON[];
   poll?: string;
-  quote?: Omit<ApiQuoteJSON, 'quoted_status'> & {
-    quoted_status?: string;
-  };
+  quote?: QuotedStatus;
   reblog?: string;
   tagged_collections: ApiCollectionJSON[];
   tags: ApiTagJSON[];
@@ -75,6 +86,23 @@ export interface StatusShape {
   replies_count: number;
   visibility: StatusVisibility;
 }
+export type AccountStatusShape = Omit<StatusShape, 'account'> & {
+  account: AccountShapeFull;
+};
+export type ExpandedStatusShape = Omit<AccountStatusShape, 'reblog'> & {
+  reblog?: Omit<ExpandedStatusShape, 'reblog'>;
+};
+
+export type AnyStatusShape =
+  | StatusShape
+  | AccountStatusShape
+  | ExpandedStatusShape;
+
+export type QuotedStatus = Simplify<
+  Omit<ApiQuoteJSON, 'quoted_status'> & {
+    quoted_status?: string;
+  }
+>;
 
 export type CardShape = Omit<ApiPreviewCardJSON, 'authors'> & {
   authors: (Omit<ApiPreviewCardAuthorJSON, 'author'> & {
@@ -86,13 +114,41 @@ export type Card = RecordOf<CardShape>;
 
 export type MediaAttachment = Immutable.Map<string, unknown>;
 
-export type MediaAttachmentShape = Omit<
-  ApiMediaAttachmentJSON,
-  'remote_url'
-> & {
+export type MediaAttachmentShape<
+  TAttachmentJSON extends ApiMediaAttachmentJSON = ApiMediaAttachmentJSON,
+> = Omit<TAttachmentJSON, 'remote_url'> & {
   remote_url: string | null;
-  translation?: string;
+  translation?: {
+    description: string;
+  };
 };
+
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: 'image',
+): attachment is MediaAttachmentShape<ApiImageAttachmentJSON>;
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: 'video',
+): attachment is MediaAttachmentShape<ApiVideoAttachmentJSON>;
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: 'gifv',
+): attachment is MediaAttachmentShape<ApiGifvAttachmentJSON>;
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: 'audio',
+): attachment is MediaAttachmentShape<ApiAudioAttachmentJSON>;
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: 'unknown',
+): attachment is MediaAttachmentShape<ApiUnknownAttachmentJSON>;
+export function isMediaAttachmentOfType(
+  attachment: MediaAttachmentShape,
+  type: MediaAttachmentType,
+) {
+  return attachment.type === type;
+}
 
 export type CollectionAttachment = RecordOf<ApiCollectionJSON>;
 
@@ -100,4 +156,6 @@ export type FilterResult = Omit<ApiFilterResultJSON, 'filter'> & {
   filter: string;
 };
 
-export type StatusTranslation = Omit<ApiStatusTranslationJSON, 'poll'>;
+export type StatusTranslation = Omit<ApiStatusTranslationJSON, 'poll'> & {
+  isLoading: boolean;
+};
